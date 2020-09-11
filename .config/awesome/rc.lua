@@ -61,7 +61,7 @@ end
 beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
-terminal = "urxvt"
+terminal = "gnome-terminal"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -636,3 +636,4 @@ awful.spawn("nm-applet")
 awful.spawn("blueman-applet")
 awful.spawn("compton --backend glx")
 awful.spawn("setxkbmap -option caps:super")
+awful.util.spawn("xinput set-prop 11 305 1")
