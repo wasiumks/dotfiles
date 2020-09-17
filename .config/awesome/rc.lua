@@ -17,6 +17,7 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
+local xrandr = require("xrandr")
 
 local cyclefocus = require('cyclefocus')
 cyclefocus.default_preset.position = 'bottom_right'
@@ -24,8 +25,8 @@ cyclefocus.cycle_filters = {}
 
 local battery_widget = require("battery-widget")
 
-local volume_control = require("volume-control")
-volumecfg = volume_control({})
+--local volume_control = require("volume-control")
+--volumecfg = volume_control({})
 
 -- Load Debian menu entries
 local debian = require("debian.menu")
@@ -61,7 +62,7 @@ end
 beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
 
 -- This is used later as the default terminal and editor to run.
-terminal = "gnome-terminal"
+terminal = "rxvt-unicode"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -247,7 +248,7 @@ awful.screen.connect_for_each_screen(function(s)
             layout = wibox.layout.fixed.horizontal,
             mykeyboardlayout,
             wibox.widget.systray(),
-            volumecfg,
+            --volumecfg,
             battery1,
             mytextclock,
             s.mylayoutbox,
@@ -275,6 +276,8 @@ globalkeys = gears.table.join(
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore,
               {description = "go back", group = "tag"}),
 
+
+    awful.key({modkey,	"Control"}, "s", function() xrandr.xrandr() end),
     awful.key({ modkey,           }, "j",
         function ()
             awful.client.focus.byidx( 1)
@@ -634,6 +637,7 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 awful.spawn("xss-lock slock")
 awful.spawn("nm-applet")
 awful.spawn("blueman-applet")
-awful.spawn("compton --backend glx")
+awful.spawn("compton --backend glx --vsync opengl-swc -b")
 awful.spawn("setxkbmap -option caps:super")
 awful.util.spawn("xinput set-prop 11 305 1")
+awful.spawn.with_shell("pkill pasystray; pasystray -a")
