@@ -18,12 +18,20 @@ local hotkeys_popup = require("awful.hotkeys_popup")
 -- when client with a matching name is opened:
 require("awful.hotkeys_popup.keys")
 local xrandr = require("xrandr")
+
 local cyclefocus = require('cyclefocus')
 cyclefocus.default_preset.position = 'bottom_right'
 cyclefocus.cycle_filters = {}
 
 local battery_widget = require("battery-widget")
-	
+
+--local volume_control = require("volume-control")
+--volumecfg = volume_control({})
+
+-- Load Debian menu entries
+--local debian = require("debian.menu")
+local has_fdo, freedesktop = pcall(require, "freedesktop")
+
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
 -- another config (This code will only ever execute for the fallback config)
@@ -51,11 +59,10 @@ end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, font and wallpapers.
---beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
-beautiful.init("~/.config/awesome/theme.lua")
---theme.wallpaper = "/home/dth/Images/Wallpapers/chicago.jpg"
+beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
+
 -- This is used later as the default terminal and editor to run.
-terminal = "termite"
+terminal = "rxvt-unicode"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -72,7 +79,7 @@ awful.layout.layouts = {
     awful.layout.suit.tile,
     awful.layout.suit.max,
     awful.layout.suit.floating,
-    --awful.layout.suit.tile.left,
+    awful.layout.suit.tile.left,
     awful.layout.suit.tile.bottom,
     awful.layout.suit.tile.top,
     --awful.layout.suit.fair,
@@ -98,10 +105,24 @@ myawesomemenu = {
    { "quit", function() awesome.quit() end },
 }
 
-mymainmenu = awful.menu({ items = { { "awesome", myawesomemenu, beautiful.awesome_icon },
-                                    { "open terminal", terminal }
-                                  }
-                        })
+local menu_awesome = { "awesome", myawesomemenu, beautiful.awesome_icon }
+local menu_terminal = { "open terminal", terminal }
+
+if has_fdo then
+    mymainmenu = freedesktop.menu.build({
+        before = { menu_awesome },
+        after =  { menu_terminal }
+    })
+else
+    mymainmenu = awful.menu({
+        items = {
+                  menu_awesome,
+                  -- { "Debian", debian.menu.Debian_menu.Debian },
+                  menu_terminal,
+                }
+    })
+end
+
 
 mylauncher = awful.widget.launcher({ image = beautiful.awesome_icon,
                                      menu = mymainmenu })
@@ -172,11 +193,12 @@ end
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
-ac_prefix="AC"
+ac_prefix="🔌"
 battery_prefix="⚡"
 
 
 battery1 = battery_widget({adapter = "BAT0", timeout=10, listen=true, ac_prefix=ac_prefix, battery_prefix=battery_prefix})
+
 
 awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
@@ -254,6 +276,8 @@ globalkeys = gears.table.join(
     awful.key({ modkey,           }, "Escape", awful.tag.history.restore,
               {description = "go back", group = "tag"}),
 
+
+    awful.key({modkey,	"Control"}, "s", function() xrandr.xrandr() end),
     awful.key({ modkey,           }, "j",
         function ()
             awful.client.focus.byidx( 1)
@@ -297,7 +321,6 @@ globalkeys = gears.table.join(
         -- cycle_filters = { cyclefocus.filters.same_screen, cyclefocus.filters.common_tag },
         keys = {'Tab', 'ISO_Left_Tab'}  -- default, could be left out
     }),
-	
 
     -- Standard program
     awful.key({ modkey,           }, "Return", function () awful.spawn(terminal) end,
@@ -341,7 +364,7 @@ globalkeys = gears.table.join(
     --          {description = "run prompt", group = "launcher"}),
 
     awful.key({modkey},	"r", function() awful.util.spawn("j4-dmenu-desktop") end,
-    {description = "run j4-dmenu prompt", group = "launcher"}),
+		{description = "run j4-dmenu prompt", group = "launcher"}),
 
 
     awful.key({ modkey }, "x",
@@ -355,19 +378,23 @@ globalkeys = gears.table.join(
               end,
               {description = "lua execute prompt", group = "awesome"}),
 
+
+
     awful.key({}, "XF86MonBrightnessUp", function() awful.util.spawn("light -A 5") end),
     awful.key({}, "XF86MonBrightnessDown", function() awful.util.spawn("light -U 5") end),
     awful.key({}, "XF86AudioRaiseVolume", function() awful.util.spawn("pactl set-sink-volume @DEFAULT_SINK@ +5%") end,
-            {description = "raise volume", group = "custom"}),
+              {description = "raise volume", group = "custom"}),
     awful.key({}, "XF86AudioLowerVolume", function() awful.util.spawn("pactl set-sink-volume @DEFAULT_SINK@ -5%") end,
-            {description = "lower volume", group = "custom"}),
+              {description = "lower volume", group = "custom"}),
     awful.key({ alt, "Control" }, "l", function() awful.util.spawn("loginctl lock-session") end,
-            {description = "lock screen", group = "custom"}),
+              {description = "lock screen", group = "custom"}),
     awful.key({}, "XF86AudioMicMute", function() awful.util.spawn("pactl set-source-mute alsa_input.pci-0000_00_1f.3.analog-stereo toggle") end,
-            {description = "mute microphone", group = "custom"}),
+              {description = "mute microphone", group = "custom"}),
     awful.key({}, "XF86AudioMute", function() awful.util.spawn("pactl set-sink-mute @DEFAULT_SINK@ toggle") end,
-            {description = "mute audio", group = "custom"}),
-          
+              {description = "mute audio", group = "custom"}),
+
+
+
 
     -- Menubar
     awful.key({ modkey }, "p", function() menubar.show() end,
@@ -607,12 +634,10 @@ end)
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
-
 awful.spawn("xss-lock slock")
 awful.spawn("nm-applet")
 awful.spawn("blueman-applet")
-awful.spawn("picom --backend glx -b")
+awful.spawn("compton --backend glx --vsync opengl-swc -b")
 awful.spawn("setxkbmap -option caps:super")
-awful.util.spawn("xinput set-prop 11 313 1")
-awful.util.spawn("xinput set-prop 12 336 0 1")
+awful.util.spawn("xinput set-prop 11 305 1")
 awful.spawn.with_shell("pkill pasystray; pasystray -a")
