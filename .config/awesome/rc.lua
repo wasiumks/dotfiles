@@ -55,7 +55,7 @@ end
 beautiful.init("~/.config/awesome/theme.lua")
 --theme.wallpaper = "/home/dth/Images/Wallpapers/chicago.jpg"
 -- This is used later as the default terminal and editor to run.
-terminal = "termite"
+terminal = "alacritty"
 editor = os.getenv("EDITOR") or "vim"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -341,7 +341,7 @@ globalkeys = gears.table.join(
     --          {description = "run prompt", group = "launcher"}),
 
     awful.key({modkey},	"r", function() awful.util.spawn("j4-dmenu-desktop") end,
-    {description = "run j4-dmenu prompt", group = "launcher"}),
+              {description = "run j4-dmenu prompt", group = "launcher"}),
 
 
     awful.key({ modkey }, "x",

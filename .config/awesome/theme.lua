@@ -11,7 +11,7 @@ local themes_path = gfs.get_themes_dir()
 
 local theme = {}
 
-theme.font          = "Ubuntu 8"
+theme.font          = "Terminus (TTF) 9"
 
 theme.bg_normal     = "#222222cc"
 theme.bg_focus      = "#2c3044cc"
@@ -89,7 +89,7 @@ theme.titlebar_maximized_button_normal_inactive = themes_path.."default/titlebar
 theme.titlebar_maximized_button_focus_inactive  = themes_path.."default/titlebar/maximized_focus_inactive.png"
 theme.titlebar_maximized_button_normal_active = themes_path.."default/titlebar/maximized_normal_active.png"
 theme.titlebar_maximized_button_focus_active  = themes_path.."default/titlebar/maximized_focus_active.png"
-theme.wallpaper = "~/.config/awesome/wp.jpg"
+theme.wallpaper = "~/.config/awesome/wallpaper.jpg"
 
 -- You can use your own layout icons like this:
 theme.layout_fairh = themes_path.."default/layouts/fairhw.png"
