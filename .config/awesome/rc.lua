@@ -23,6 +23,7 @@ cyclefocus.default_preset.position = 'bottom_right'
 cyclefocus.cycle_filters = {}
 
 local battery_widget = require("battery-widget")
+-- local brightness_widget = require("awesome-wm-widgets.brightness-widget.brightness")
 	
 -- {{{ Error handling
 -- Check if awesome encountered an error during startup and fell back to
@@ -53,6 +54,7 @@ end
 -- Themes define colours, icons, font and wallpapers.
 --beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
 beautiful.init("~/.config/awesome/theme.lua")
+naughty.config.defaults['icon_size'] = 100
 --theme.wallpaper = "/home/dth/Images/Wallpapers/chicago.jpg"
 -- This is used later as the default terminal and editor to run.
 terminal = "alacritty"
@@ -227,6 +229,11 @@ awful.screen.connect_for_each_screen(function(s)
             mykeyboardlayout,
             wibox.widget.systray(),
             --volumecfg,
+            -- brightness_widget{
+            --     type = 'arc',
+            --     program = 'light',
+            --     step = 2,        
+            -- },
             battery1,
             mytextclock,
             s.mylayoutbox,
@@ -355,6 +362,10 @@ globalkeys = gears.table.join(
               end,
               {description = "lua execute prompt", group = "awesome"}),
 
+    awful.key({ modkey, "Shift"   }, "s", function () awful.util.spawn_with_shell("sleep 0.5 && scrot -s")   end,
+            {description = "selection screenshot", group = "custom"}),
+    awful.key({modkey}, "e", function() awful.util.spawn("files") end,
+            {description = "nnn file manager", group = "custom"}),
     awful.key({}, "XF86MonBrightnessUp", function() awful.util.spawn("light -A 5") end),
     awful.key({}, "XF86MonBrightnessDown", function() awful.util.spawn("light -U 5") end),
     awful.key({}, "XF86AudioRaiseVolume", function() awful.util.spawn("pactl set-sink-volume @DEFAULT_SINK@ +5%") end,
@@ -608,11 +619,25 @@ client.connect_signal("focus", function(c) c.border_color = beautiful.border_foc
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
 
+screen.connect_signal("arrange", function (s)
+    local max = s.selected_tag.layout.name == "max"
+    local only_one = #s.tiled_clients == 1 -- use tiled_clients so that other floating windows don't affect the count
+    -- but iterate over clients instead of tiled_clients as tiled_clients doesn't include maximized windows
+    for _, c in pairs(s.clients) do
+        if (max or only_one) and not c.floating or c.maximized then
+            c.border_width = 0
+        else
+            c.border_width = beautiful.border_width
+        end
+    end
+end)
+
+
 awful.spawn("xss-lock slock")
 awful.spawn("nm-applet")
 awful.spawn("blueman-applet")
 awful.spawn("picom --backend glx -b")
 awful.spawn("setxkbmap -option caps:super")
-awful.util.spawn("xinput set-prop 11 313 1")
-awful.util.spawn("xinput set-prop 12 336 0 1")
+awful.util.spawn("xinput set-prop 12 344 1")
 awful.spawn.with_shell("pkill pasystray; pasystray -a")
+awful.spawn.with_shell("/usr/bin/gnome-keyring-daemon --start --components=pkcs11,secrets,ssh")
