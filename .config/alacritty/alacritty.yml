@@ -1,10 +1,16 @@
+shell:
+  program: /bin/bash
+  args:
+    - -l
+    - -c
+    - "tmux"
 font:
   # The normal (roman) font face to use.
   normal:
     family: Terminus (TTF)
     # Style can be specified to pick a specific face.
     style: Regular
-  size: 7.0
+  size: 7
 
 colors:
   # Default colors
@@ -34,3 +40,7 @@ colors:
     cyan:    '0x8abeb7'
     white:   '0xc5c8c6'
 
+  key_bindings:
+    - { key: Key0,     mods: Command, action: ResetFontSize }
+    - { key: Equals,   mods: Command, action: IncreaseFontSize }
+    - { key: Minus,    mods: Command, action: DecreaseFontSize }
