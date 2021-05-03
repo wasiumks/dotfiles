@@ -351,16 +351,16 @@ globalkeys = gears.table.join(
               {description = "run j4-dmenu prompt", group = "launcher"}),
 
 
-    awful.key({ modkey }, "x",
-              function ()
-                  awful.prompt.run {
-                    prompt       = "Run Lua code: ",
-                    textbox      = awful.screen.focused().mypromptbox.widget,
-                    exe_callback = awful.util.eval,
-                    history_path = awful.util.get_cache_dir() .. "/history_eval"
-                  }
-              end,
-              {description = "lua execute prompt", group = "awesome"}),
+    -- awful.key({ modkey }, "x",
+    --           function ()
+    --               awful.prompt.run {
+    --                 prompt       = "Run Lua code: ",
+    --                 textbox      = awful.screen.focused().mypromptbox.widget,
+    --                 exe_callback = awful.util.eval,
+    --                 history_path = awful.util.get_cache_dir() .. "/history_eval"
+    --               }
+    --           end,
+    --           {description = "lua execute prompt", group = "awesome"}),
 
     awful.key({ modkey, "Shift"   }, "s", function () awful.util.spawn_with_shell("sleep 0.5 && scrot -s")   end,
             {description = "selection screenshot", group = "custom"}),
@@ -378,6 +378,8 @@ globalkeys = gears.table.join(
             {description = "mute microphone", group = "custom"}),
     awful.key({}, "XF86AudioMute", function() awful.util.spawn("pactl set-sink-mute @DEFAULT_SINK@ toggle") end,
             {description = "mute audio", group = "custom"}),
+    awful.key({modkey}, "x", function() awful.util.spawn("autorandr --change") end,
+            {description = "autorandr change", group = "custom"}),
           
 
     -- Menubar
